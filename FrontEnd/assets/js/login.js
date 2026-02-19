@@ -11,6 +11,9 @@ console.log("Le formulaire est relié au JS")
 // ETAPE 2 : On écoute l'évènement de soumission du formulaire
 // 2.1 : On à créer une const (variable) pour cibler le formulaire dans le DOM
 const form = document.getElementById("login-form")
+const inputEmail = document.getElementById("email")
+const inputPassword = document.getElementById("password")
+console.log(form)
 
 // 2.2 : On crée un écouteur d'évènement sur le formulaire pour écouter la soumission du formulaire
 form.addEventListener("submit", event => {
