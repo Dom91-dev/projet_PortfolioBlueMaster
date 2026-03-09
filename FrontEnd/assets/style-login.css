@@ -1,0 +1,113 @@
+body{
+    background-color: #fffef8;
+    font-family: 'work sans', sans-serif;
+}
+
+
+header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 40px 0 40px;
+}
+header h1 span{
+    font-family: 'work sans', sans-serif;
+    font-weight: 400;
+    font-size: 10px;
+    font-style: regular;
+}
+header nav ul {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    list-style-type: none;
+    color: #3d3d3d;
+    font-family: 'work sans', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    font-style: regular;
+}
+.active, .active2{
+    transform: scale(1.1);
+    font-weight: 700;
+    font-style: semi-bold;
+}
+header nav img{
+    width:20px;
+    height: auto;
+    cursor:pointer;
+}
+
+main{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 200px;
+    gap: 30px;
+}
+
+form{
+    display : flex;
+    flex-direction: column;
+    gap: 20px;
+    width:300px;
+}
+form label{
+    color:#3d3d3d;
+    font-family: 'work sans', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    font-style: medium;
+
+}
+input{
+    display: flex;
+    flex-direction: column;
+    width: 279px;
+    padding: 10px;
+    border: 1px solid #d9d9d9;
+    border-radius : 1px;
+    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.09);
+}
+
+input .email .passwoerd{}
+
+form button{
+    align-self: center;
+    width: 150px;
+    padding: 5px 4px 5px 4px;
+    border-radius: 20px;
+    background-color: #1D6154;
+    color: white;
+}
+form button:hover{
+    background-color: #1D6154;
+    color: white;
+    cursor: pointer;
+}
+
+
+
+a{
+    text-align: center;
+    color :#3d3d3d;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 200;
+
+
+}
+
+footer{
+    display: flex;
+    justify-content: right;
+    max-width: 1440px;
+    margin-top: 350px;
+}
+footer li{
+    color :#3d3d3d;
+    font-family: 'work sans', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    font-style: light;
+}
