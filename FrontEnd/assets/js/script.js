@@ -111,21 +111,32 @@ try {
 
 
 // Prochaine étape 
-/*
- 1 : Vérifier si l'utilisateur est connecté (token dans le localStorage)
- 1 a: Si oui -> afficher les élements admin (barre noir en haut) + bouton éditions
- 1 b : si non -> masquer les éléments admin + bouton édition
+
+ //1 : Vérifier si l'utilisateur est connecté (token dans le localStorage)
+ 
+ const token = localStorage.getItem("token");
+ console.log(token);
+
+// 1 a: Si oui -> afficher les élements admin (barre noir en haut) + bouton éditions
+if (token){
+  console.log("utilisateur connecté");
+} else{
+  console.log("utilisateur non connecté");
+}
+ 
+ //1 b : si non -> masquer les éléments admin + bouton édition
+ if ("utilisateur non connecté"){
+  console.log("masquer les éléments admin + bouton édition"); 
+ }
 
 
  // Modal 
 
- Je clique sur Edition -> la modale s'affiche
+ //Je clique sur Edition -> la modale s'affiche
 
- 2 : La modal affiche tous les works avec un bouton de suppresion (icone poubelle (a faire en dernier))
- 2 : Bouton ajouter une photo qui va t'amener sur une 2 eme modale avec le formulaire qui permet de créer un work (image, titre, une catégorie)
- 3 : On sauvegarde (e.prevendDefault()) pour ne pas recharger la page lors de l'envoie
- 4 : Suppresion d'un works dans la modale et dans le DOM et affichage en direct sans rechargement de la page
+ //2 : La modal affiche tous les works avec un bouton de suppresion (icone poubelle (a faire en dernier))
+ //2 : Bouton ajouter une photo qui va t'amener sur une 2 eme modale avec le formulaire qui permet de créer un work (image, titre, une catégorie)
+ //3 : On sauvegarde (e.prevendDefault()) pour ne pas recharger la page lors de l'envoie
+ //4 : Suppresion d'un works dans la modale et dans le DOM et affichage en direct sans rechargement de la page
 
 
-
-*/
