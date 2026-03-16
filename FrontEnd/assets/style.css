@@ -137,6 +137,12 @@ li:hover {
 	width: 100%;
 
 }
+
+.hidden{
+	display:none;
+}
+
+
 #contact {
 	width: 50%;
 margin: auto;

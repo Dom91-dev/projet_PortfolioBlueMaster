@@ -135,8 +135,78 @@ if (token){
  //Je clique sur Edition -> la modale s'affiche
 
  //2 : La modal affiche tous les works avec un bouton de suppresion (icone poubelle (a faire en dernier))
- //2 : Bouton ajouter une photo qui va t'amener sur une 2 eme modale avec le formulaire qui permet de créer un work (image, titre, une catégorie)
+async function getWorks() {
+      const response = await fetch("http://localhost:5678/api/works");
+      const works = await response.json();
+      return works;
+}
+async function afficherWorksModal(){
+      const works = await getWorks();
+      const galleryModal = document.querySelector(".gallery-modal");
+    galleryModal.innerHTML = "";
+    works.forEach(work => {
+      constimg = document.createElement("img");
+      img.src = work.imageUrl;
+      galleryModal.appendChild(img);
+    })}
+ //2.2 : Bouton ajouter une photo qui va t'amener sur une 2 eme modale avec le formulaire qui permet de créer un work (image, titre, une catégorie)
+ const btnAjoutPhoto = document.querySelector(".btn-ajout-photo");
+ const modalGallery = document.querySelector(".modal-gallery");
+ const modalForm = document.querySelector(".modal-form");
+ btnAjoutPhoto.addEventListener("click",()=>{
+               modalGallery.addEventListener("hidden",()=>{
+              modalForm.classList.remove("hidden");
+               })
+ })
  //3 : On sauvegarde (e.prevendDefault()) pour ne pas recharger la page lors de l'envoie
+ const formAjoutWork = document.querySelector("#form-ajout-work");
+ formAjoutWork.addEventListener("submit", async (e)=> {
+  e.preventDefault();
+  console.log("formulaire envoyé");
+
+ });
+
+ formAjoutWork.addEventListener("submit", async (e) =>{
+  e.preventDefault();
+  const image = document.querySelector("#image").files[0];
+  const title = document.querySelector("#title").value;
+  const category = document.querySelector("#category").value;
+  console.log(image,title,category);
+ });
+
+ const formData = new FormData();
+ formData.append("image",image);
+ formData.append("title",title);
+ formData.append("category",category);
+
+ console.log(formData);
+
+ formAjoutWork.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const token = localStorage.getItem("token");
+
+  const image = document.querySelector("#image").files[0];
+  const title = document.querySelector("#title").value;
+  const category = document.querySelector("#category").value;
+
+  const formData = new FormData();
+  formData.append("image",image);
+  formData.append("title",title);
+  formData.append("category",category);
+
+  const reponse = await fetch("http://Localhost:5678/api/works",{
+    method: "POST",
+    headers:{
+      Authorization: 'Bearer ${token}'
+    },
+    body: formData
+  });
+  if (respons.ok){
+    console.log("Work ajouté avec succès");
+  } else {
+    console.log("Erreur lors de l'ajout du work");
+  }
+ });
  //4 : Suppresion d'un works dans la modale et dans le DOM et affichage en direct sans rechargement de la page
 
 
