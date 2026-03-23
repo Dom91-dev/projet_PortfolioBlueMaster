@@ -5,7 +5,16 @@ console.log("Le formulaire est relié au JS");
 // On récupère les éléments du DOM où on injectera les filtres et les projets
 const divFilters = document.querySelector(".filters");
 const divProjects = document.querySelector(".gallery");
-
+const token = localStorage.getItem("token");
+const modal = document.getElementById("modal")
+const modalPartOne = document.getElementById("modal-part-1");
+const modalPartTwo = document.getElementById("modal-part-1");
+const contentModal = document.getElementById("gallery-modal");
+const linkOpenModal = document.getElementById('link-modif')
+const buttonAdd = document.getElementById('btn-add')
+const editionMode = document.querySelector("#edition-mode")
+const linkModif = document.querySelectorAll("link-modif")
+ 
 // ===== APPEL API =====
 // On utilise fetch() pour récupérer les works depuis l'API (requête GET par défaut)
 // Le try/catch permet de gérer les erreurs réseau ou JS
@@ -95,6 +104,9 @@ try {
                 </a>
               </div>
             `;
+
+  
+      contentModal.innerHTML = projectModalHTML;
           });
         });
       });
@@ -111,77 +123,103 @@ try {
 
 
 // Prochaine étape 
-
- //1 : Vérifier si l'utilisateur est connecté (token dans le localStorage)
- 
- const token = localStorage.getItem("token");
- console.log(token);
-
 // 1 a: Si oui -> afficher les élements admin (barre noir en haut) + bouton éditions
 if (token){
   console.log("utilisateur connecté");
-} else{
+  //afficher le boutton "mode édition"
+  if (linkOpenModal) linkOpenModal.style.display = "inline-block";
+  //afficher le bandeau noir
+  if (editionMode) editionMode.style.display = "flex";
+  //cacher les filtres
+  if (divFilters) divFilters.style.display ="none";
+} else {
   console.log("utilisateur non connecté");
+  //masquer les bouttons
+  if (linkOpenModal) linkOpenModal.style.display ="none";
+  //masquer le bandeau noir
+  if (editionMode) editionMode.style.display = "none";
+  //afficher les filtres
+  if (divFilters) divFilters.style.display = "flex";
 }
- 
- //1 b : si non -> masquer les éléments admin + bouton édition
- if ("utilisateur non connecté"){
-  console.log("masquer les éléments admin + bouton édition"); 
- }
 
 
- // Modal 
 
- //Je clique sur Edition -> la modale s'affiche
+//1 b : si non -> masquer les éléments admin + bouton édition
+  console.log("masquer les éléments admin + bouton édition");
 
- //2 : La modal affiche tous les works avec un bouton de suppresion (icone poubelle (a faire en dernier))
+
+
+// Modal 
+
+//Je clique sur Edition -> la modale s'affiche
+
+//2 : La modal affiche tous les works avec un bouton de suppresion (icone poubelle (a faire en dernier))
 async function getWorks() {
-      const response = await fetch("http://localhost:5678/api/works");
-      const works = await response.json();
-      return works;
+  const response = await fetch("http://localhost:5678/api/works");
+  const works = await response.json();
+
+  return works;
 }
-async function afficherWorksModal(){
-      const works = await getWorks();
-      const galleryModal = document.querySelector(".gallery-modal");
-    galleryModal.innerHTML = "";
-    works.forEach(work => {
-      constimg = document.createElement("img");
-      img.src = work.imageUrl;
-      galleryModal.appendChild(img);
-    })}
- //2.2 : Bouton ajouter une photo qui va t'amener sur une 2 eme modale avec le formulaire qui permet de créer un work (image, titre, une catégorie)
- const btnAjoutPhoto = document.querySelector(".btn-ajout-photo");
- const modalGallery = document.querySelector(".modal-gallery");
- const modalForm = document.querySelector(".modal-form");
- btnAjoutPhoto.addEventListener("click",()=>{
-               modalGallery.addEventListener("hidden",()=>{
-              modalForm.classList.remove("hidden");
-               })
- })
- //3 : On sauvegarde (e.prevendDefault()) pour ne pas recharger la page lors de l'envoie
- const formAjoutWork = document.querySelector("#form-ajout-work");
- formAjoutWork.addEventListener("submit", async (e)=> {
+
+linkOpenModal.addEventListener('click', () => {
+  modal.showModal();
+  modalPartOne.setAttribute("style", "")
+})
+
+
+buttonAdd.addEventListener('click', (e) => {
+  e.preventDefault();
+  modalPartOne.setAttribute('style', 'display:none')
+  modalPartTwo.setAttribute("style", "")
+})
+
+
+/*
+async function afficherWorksModal() {
+  const works = await getWorks();
+  const galleryModal = document.querySelector(".gallery-modal");
+  galleryModal.innerHTML = "";
+  works.forEach(work => {
+    constimg = document.createElement("img");
+    img.src = work.imageUrl;
+    galleryModal.appendChild(img);
+  })
+}
+
+
+//2.2 : Bouton ajouter une photo qui va t'amener sur une 2 eme modale avec le formulaire qui permet de créer un work (image, titre, une catégorie)
+const btnAjoutPhoto = document.querySelector(".btn-ajout-photo");
+const modalGallery = document.querySelector(".modal-gallery");
+const modalForm = document.querySelector(".modal-form");
+btnAjoutPhoto.addEventListener("click", () => {
+    console.log("ici")
+    modalForm.classList.remove("hidden");
+ 
+})
+//3 : On sauvegarde (e.prevendDefault()) pour ne pas recharger la page lors de l'envoie
+const formAjoutWork = document.querySelector("#form-ajout-work");
+formAjoutWork.addEventListener("submit", async (e) => {
   e.preventDefault();
   console.log("formulaire envoyé");
 
- });
+});
 
- formAjoutWork.addEventListener("submit", async (e) =>{
+formAjoutWork.addEventListener("submit", async (e) => {
   e.preventDefault();
   const image = document.querySelector("#image").files[0];
   const title = document.querySelector("#title").value;
   const category = document.querySelector("#category").value;
-  console.log(image,title,category);
- });
+  console.log(image, title, category);
+});
 
- const formData = new FormData();
- formData.append("image",image);
- formData.append("title",title);
- formData.append("category",category);
+const formData = new FormData();
+formData.append("image", image);
+formData.append("title", title);
+formData.append("category", category);
 
- console.log(formData);
+console.log(formData);
 
- formAjoutWork.addEventListener("submit", async (e)=>{
+formAjoutWork.addEventListener("submit", async (e) => {
   e.preventDefault();
   const token = localStorage.getItem("token");
 
@@ -190,23 +228,24 @@ async function afficherWorksModal(){
   const category = document.querySelector("#category").value;
 
   const formData = new FormData();
-  formData.append("image",image);
-  formData.append("title",title);
-  formData.append("category",category);
+  formData.append("image", image);
+  formData.append("title", title);
+  formData.append("category", category);
 
-  const reponse = await fetch("http://Localhost:5678/api/works",{
+  const reponse = await fetch("http://Localhost:5678/api/works", {
     method: "POST",
-    headers:{
+    headers: {
       Authorization: 'Bearer ${token}'
     },
     body: formData
   });
-  if (respons.ok){
+  if (respons.ok) {
     console.log("Work ajouté avec succès");
   } else {
     console.log("Erreur lors de l'ajout du work");
   }
- });
- //4 : Suppresion d'un works dans la modale et dans le DOM et affichage en direct sans rechargement de la page
+});
+//4 : Suppresion d'un works dans la modale et dans le DOM et affichage en direct sans rechargement de la page
 
 
+*/
