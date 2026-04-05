@@ -5,15 +5,28 @@ console.log("Le formulaire est relié au JS");
 // On récupère les éléments du DOM où on injectera les filtres et les projets
 const divFilters = document.querySelector(".filters");
 const divProjects = document.querySelector(".gallery");
+const loginLink = document.getElementById("login-link");
 const token = localStorage.getItem("token");
-const modal = document.getElementById("modal")
-const modalPartOne = document.getElementById("modal-part-1");
-const modalPartTwo = document.getElementById("modal-part-1");
+const modal=document.getElementById("modal")
+const modalPart1 = document.getElementById("modal-part-1");
+const modalPart2 = document.getElementById("modal-part-2");
+const buttonAdd = document.getElementById('btn-add')
+const backBtn = document.getElementById("icon-back");
+const closeModal1 = document.getElementById("close-modal-1")
+const closeModal2 = document.getElementById("close-modal-2")
 const contentModal = document.getElementById("gallery-modal");
 const linkOpenModal = document.getElementById('link-modif')
-const buttonAdd = document.getElementById('btn-add')
+const iconBack = document.getElementById ("icon-back")
 const editionMode = document.querySelector("#edition-mode")
 const linkModif = document.querySelectorAll("link-modif")
+const openModalLink = document.getElementById("link-modif")
+
+
+const titre = document.querySelector("#portfolio h2");
+const btnModifier= document.createElement("span");
+
+
+
  
 // ===== APPEL API =====
 // On utilise fetch() pour récupérer les works depuis l'API (requête GET par défaut)
@@ -119,6 +132,29 @@ try {
   // Gestion des erreurs : affichage en console + alerte utilisateur
   console.error(error);
   alert("La requête n'a pas pu être effectuée");
+
+}
+
+
+//Action login et logout
+
+if (loginLink) {
+  //le tetxte change en fonction de la presence du token
+  loginLink.textContent = token ? "Logout" : "Login";
+  // met a jour le lien en foction de la présence du token
+  loginLink.addEventListener("click", (event) => {
+
+    if (token){
+      
+      event.preventDefault();
+      // deconnexion 
+      localStorage.removeItem("token");
+      window.location.reload();
+    } else {
+    //redirection vers la page de connexion
+      window.location.href = "login.html";
+    }
+  })
 }
 
 
@@ -150,6 +186,94 @@ if (token){
 
 
 // Modal 
+openModalLink.addEventListener("click", function (e){
+  e.preventDefault();
+  modal.showModal();
+
+
+modalPart1.classList.add("active");
+modalPart2.classList.remove("active");
+});
+
+buttonAdd.addEventListener("click", function (e){
+  e.preventDefault();
+  modalPart1.classList.remove("active");
+  modalPart2.classList.add("active");
+  console.log('Passage modal2');
+});
+
+iconBack.addEventListener("click",function(e){
+  e.preventDefault();
+  modalPart2.classList.remove("active");
+  modalPart1.classList.add("active");
+  console.log('Retour modal1');
+});
+
+closeModal1.addEventListener("click",function (e){
+  e.preventDefault();
+  modal.close();
+});
+
+closeModal2.addEventListener("click",function (e){
+  e.preventDefault();
+  modal.close()
+});
+
+modal.addEventListener("click",function(e){
+  const rect= modal.getBoundingClientRect();
+  const isInDialog =
+  e.clientX >= rect.left &&
+  e.clientX <= rect.right &&
+  e.clientY >= rect.top &&
+  e.clientY <= rect.bottom;
+  if (!isInDialog){
+    modal.close();
+  }
+});
+
+
+
+
+console.log ("Token :", token);
+// Si le token existe, on affiche le bouton "Modifier" à côté du titre "Portfolio"
+if (token){
+  btnModifier.innerHTML = '<i class="fa-regular fa-pen-to-square"></i> Modifier';
+  btnModifier.classList.add("btn-modifier");
+  btnModifier.style.marginLeft = "10px";
+  btnModifier.style.cursor = "pointer";
+// On ajoute le bouton "Modifier" à côté du titre "Portfolio"
+  document.querySelector("#portfolio h2").appendChild(btnModifier);
+  // On ajoute un événement au clic sur le bouton "Modifier" pour ouvrir la modale
+  btnModifier.addEventListener("click", () => {
+    document.getElementById ("modal") .showModal();
+    modalPart1.classList.add("active");
+    modalPart2.classList.remove("active");
+  });
+}
+
+// Au clic sur le bouton "Ajouter une photo" dans la première modale, on affiche la deuxième modale avec le formulaire
+
+buttonAdd.addEventListener("click", function (e){
+  e.preventDefault();
+  e.stopPropagation();
+
+  modalPart1.classList.remove("active");
+  modalPart2.classList.add("active");
+});
+
+backBtn.addEventListener("click", function (e){
+  e.preventDefault();
+  e.stopPropagation();
+
+  modalPart2.classList.remove("active");
+  modalPart1.classList.add("active");
+});
+
+
+
+
+
+
 
 //Je clique sur Edition -> la modale s'affiche
 
@@ -163,15 +287,22 @@ async function getWorks() {
 
 linkOpenModal.addEventListener('click', () => {
   modal.showModal();
-  modalPartOne.setAttribute("style", "")
+  modalPart1.setAttribute("style", "")
 })
 
 
 buttonAdd.addEventListener('click', (e) => {
   e.preventDefault();
-  modalPartOne.setAttribute('style', 'display:none')
-  modalPartTwo.setAttribute("style", "")
+  modalPart1.setAttribute('style', 'display:none')
+  modalPart1.setAttribute("style", "")
 })
+
+if (token) {
+  linkOpenModal.style.display = "inline-block";
+} else {
+  linkOpenModal.style.display = "none";
+}
+
 
 
 /*

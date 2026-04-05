@@ -11,12 +11,14 @@
 		rel="stylesheet">
 	<meta name="description" content="">
 	<link rel="stylesheet" href="./assets/style.css">
+	<link href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" rel="stylesheet">
 	<script src="./assets/js/script.js" defer></script>
 </head>
 
 <body>
-	<div id ="edition-mode">
-		Mode édition
+	<div id ="edition-mode" class = "edition-mode">
+		<i class="fa-regular fa-pen-to-square"></i>
+		<span>Mode édition</span>
 	</div>
 	<header>
 		<h1>Sophie Bluel <span>Architecte d'intérieur</span></h1>
@@ -24,7 +26,7 @@
 			<ul>
 				<li>projets</li>
 				<li>contact</li>
-				<li><a href="login.html">login</a></li>
+				<li><a id = "login-link" href="login.html">login</a></li>
 				<li><img src="./assets/icons/instagram.png" alt="Instagram"></li>
 			</ul>
 		</nav>
@@ -48,8 +50,53 @@
 		<section id="portfolio">
 			<h2>Mes Projets</h2>
 			<div class="filters">
+				<button class="filter-btn active" data-category="all">Tous</button>
+				<button class="filter-btn" data-category="1">Objets</button>
+				<button class="filter-btn" data-category="2">Appartements</button>
+				<button class="filter-btn" data-category="3">Hotels et restaurants</button>
 			</div>
 			<div class="gallery">
+				<figure>
+					<img src="assets/images/abajour-tahina.png" alt ="Abajour - Tahina">
+					<figucaption>Abajour - Tahina</figcaption>
+				</figure>
+				<figure>
+					<img src="assets/images/appartement-paris-v.png" alt  ="Appartement - Paris V">
+					<figcaption>Appartement - Paris V</figcaption>
+				</figure>
+				<figure>
+					<img src="assets/images/restaurant-sushisen-londres.png" alt="Restaurant Sushisen - Londres">
+					<figcaption>Restaurant Sushisen - Londres</figcaption> 
+				</figure>
+				<figure>
+					<img src="assets/images/la-balisiere.png" alt = "La - Balisiere">
+					<figcaption>La - Balisiere</figcaption>
+				</figure>
+				</figure>
+				<figure>
+					<img src="assets/images/structures-thermopolis.png" alt ="Structures - Thermopolis">
+					<figcaption>Structures - Thermopolis</figcaption>
+				</figure>
+				<figure>
+					<img src="assets/images/appartement-paris-x.png" alt="Appartement - Paris X">
+					<figcaption>Appartement - Paris X </figcaption>
+				</figure>
+				<figure>
+					<img src="assets/images/le-coteau-cassis.png" alt="Le Coteau - Cassis">
+					<figcaption>Le Coteau - Cassis</figcaption>
+				</figure>
+				<figure>
+					<img src="assets/images/villa-ferneze.png" alt="Villa Ferneze">
+					<figcaption>Villa Ferneze</figcaption>
+				</figure>
+				<figure>
+					<img src="assets/images/appartement-paris-xviii.png" alt="Appartement - Paris XVIII">
+					<figcaption>Appartement - Paris XVIII</figcaption>
+				</figure>
+				<figure>
+					<img src="assets/images/bar-lullaby-paris.png"alt= "Bar Lullaby - Paris">
+					<figcaption>Bar Lullaby - Paris </figcaption>
+				</figure>
 				<figure>
 					<img src="assets/images/hotel-first-arte-new-delhi.png" alt="Hotel First Arte - New Delhi">
 					<figcaption>Hotel First Arte - New Delhi</figcaption>
@@ -74,8 +121,8 @@
 
 		<dialog id="modal">
 
-			<div id="modal-part-1">
-				<a class="icon-close"><i class="fa-solid fa-x"></i></a>
+			<div id="modal-part-1" class="modal-view active">
+				<a href= "#" class="icon-close" id ="close-modal-1"><i class="fa-solid fa-x"></i></a>
 
 				<h3>Gallerie Photo</h3>
 				<div id="gallery-modal"></div>
@@ -85,16 +132,21 @@
 			</div>
 
 
-			<div id="modal-part-2">
+			<div id="modal-part-2" class="modal-view">
 				<div id="div-icon-close-pt2">
-					<a id="icon-back"> <i class="fa-solid fa-arrow-left"></i></a>
-						<a class="icon-close"><i class="fa-solid fa-x"></i></a>
+					<a href="#" id="icon-back"> <i class="fa-solid fa-arrow-left"></i></a>
+						<a href="#" class="icon-close" id="close-modal-2"><i class="fa-solid fa-xmark"></i></a>
 				</div>
 				<h3>Ajout photo</h3>
 				<form id="form-ajout-work">
-					<input type="file" id="image">
+					<input type="file" id="image" accept="image/*">
 					<input type="text" id="title" placeholder="Titre">
-					<select id="category"></select>
+					<select id="category">
+						<option value="">Sélectionné une catégorie</option>
+						<option value="1">Objets</option>
+						<option value="2">Appartements</option>
+						<option value="3">Hotels et restaurants</option>
+					</select>
 					<button type="submit">Valider</button>
 				</form>
 			</div>
