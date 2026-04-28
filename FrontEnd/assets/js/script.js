@@ -20,9 +20,12 @@ const contentModal = document.getElementById("gallery-modal");
 const linkOpenModal = document.getElementById("link-modif");
 const editionMode = document.querySelector("#edition-mode");
 const formAddWork = document.getElementById("form-ajout-work");
+const previewImage = document.getElementById("preview");
+const imageInput = document.querySelector("#image");
 
 // Tableau pour stocker tous les travaux récupérés depuis l'API
 let allWorks = [];
+let allCategories = [];
 
 // ===== FONCTIONS D'AUTHENTIFICATION =====
 // Fonction pour gérer le mode d'authentification (connecté ou non)
@@ -174,6 +177,9 @@ async function afficherFiltres() {
       throw new Error("Erreur de la requête catégories");
     }
     const categories = await response.json();
+    allCategories = categories;
+
+
     if (!divFilters) return;
 
     divFilters.innerHTML = "";
@@ -334,6 +340,7 @@ async function init() {
   setupModalEvents();
   await fetchWorks();
   await afficherFiltres();
+  populateCategorySelect();
   if (token) {
     addModifierButton();
   }
@@ -345,5 +352,44 @@ if (formAddWork) {
   formAddWork.addEventListener("submit", submitNewWork);
 }
 
+
+function populateCategorySelect() {
+
+  try {
+    const selectCategory = document.getElementById("category");
+    if (!selectCategory) return;
+
+    selectCategory.innerHTML = '<option value="">Sélectionner une catégorie</option>';
+
+    allCategories.forEach((category) => {
+      const option = document.createElement("option");
+      option.value = category.id;
+      option.textContent = category.name;
+      selectCategory.appendChild(option);
+    });
+  }
+  catch (error) {
+    console.error("Erreur lors du remplissage du select :", error);
+  }
+}
+
+if (imageInput) {
+  imageInput.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewImage.src = e.target.result;
+        previewImage.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    } else {
+      previewImage.style.display = "none";
+    }
+  });
+}
+
+
 // Écouteur pour l'initialisation une fois le DOM chargé
 document.addEventListener("DOMContentLoaded", init);
+

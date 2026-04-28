@@ -38,7 +38,7 @@ form.addEventListener("submit", event => {
         if (response.ok) { // SI OK (20*) https://developer.mozilla.org/fr/docs/Web/HTTP/Reference/Status
             return response.json()
         } else {
-            console.log("erreur de connexion")
+            console.alert("erreur de connexion")
         }
     }).then(({ token }) => { // On récupère le token de l'API (BACKEND) et on le stocke dans le localStorage du navigateur
         window.localStorage.setItem("token", token)

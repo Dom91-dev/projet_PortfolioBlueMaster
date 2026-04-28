@@ -89,12 +89,10 @@
 				<h3>Ajout photo</h3>
 				<form id="form-ajout-work">
 					<input type="file" id="image" accept="image/*">
+					<img id="preview" src="#" alt="" accept="image/*">
 					<input type="text" id="title" placeholder="Titre">
 					<select id="category">
 						<option value="">Sélectionné une catégorie</option>
-						<option value="1">Objets</option>
-						<option value="2">Appartements</option>
-						<option value="3">Hotels et restaurants</option>
 					</select>
 					<button type="submit">Valider</button>
 				</form>
@@ -121,5 +119,42 @@
 3 : Ajouter une font awesome (trash) sur chaque image de la gallerie dans la modale et au clique sur le bouton supprimer l'id de la base de données (API DELETE)
 4 : Ajouter un works dans la modale, reprendre le formulaire de la maquette (ne te soucis pas du format de l'image ni de la taille)
 5 : Quand j'ajouter une image dans la galleries, le DOM en dessous de la modale s'actualise sans rechargement de la page + mise à jour dans la modale (GetWorks)
+
+
+
+
+Manipuler les éléments du DOM avec JavaScript
+Le code front-end peut être validé si : 
+
+❒ Le code respecte la maquette.
+
+X Les travaux de l’architecte dans la galerie sont bien récupérés depuis l’API.
+
+X Lorsque l’on est connecté, il est possible de supprimer un des travaux. Cela ne recharge pas la page, et le changement se voit directement. 
+
+X Lorsque l’on est connecté, il est possible d’ajouter un travail. Le travail s’ajoute à la galerie (de la modale ainsi que la page d’accueil) sans nécessité de recharger la page.
+
+
+Gérer les évènements utilisateur avec JavaScript
+Le code front-end peut être validé si : 
+
+X Les travaux se filtrent bien en fonction de la sélection de filtre, sans rechargement de page. 
+
+X Lorsque l’on clique sur l’onglet ‘Tous’, nous récupérons bien la liste de tous les projets. 
+
+X Les évènements de la souris sont bien ajoutés depuis le JavaScript, et non pas intégrés dans le HTML via des propriétés comme ‘onclick’.
+
+
+Récupérer les données utilisateur dans le JavaScript via des formulaires 
+Le code front-end peut être validé si :
+
+X Le formulaire de login permet de récupérer la connexion de l’utilisateur et d’afficher l’interface d’administration du site.
+
+❒ En cas d’erreur dans le mot de passe ou l’e-mail de l’utilisateur, un message d’erreur apparaît. 
+Mettre une balise <span> pour afficher le message d'erreur dans le HTML pour éviter un console.log ou une alert .. 
+
+X Le formulaire d'ajout d'un nouveau travail ne peut être validé que si toutes les informations sont renseignées.
+
+Nettoyer le code, supprimer les commentaires inutiles, indentation du code, optimsation si possible + Mise à jour du projet sur GITHUB
 
 -->
