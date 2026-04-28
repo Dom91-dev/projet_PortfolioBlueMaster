@@ -20,11 +20,12 @@ const iconBack = document.getElementById ("icon-back")
 const editionMode = document.querySelector("#edition-mode")
 const linkModif = document.querySelectorAll("link-modif")
 const openModalLink = document.getElementById("link-modif")
+const formAddWork = document.getElementById("form-ajout-work")
 
 
 const titre = document.querySelector("#portfolio h2");
 const btnModifier= document.createElement("span");
-
+let allWorks = [];
 
 
  
@@ -44,7 +45,7 @@ try {
     })
     .then((works) => {
       // "works" est maintenant un tableau d'objets JS exploitable
-
+      
       // ===== GÉNÉRATION DES FILTRES =====
       // Un Set ne stocke que des valeurs uniques → pas de doublons de catégories
       const categoryName = new Set();
@@ -60,7 +61,7 @@ try {
 
       // Bouton "Tous" : son id contient TOUTES les catégories (séparées par des virgules)
       // Astuce : quand on fera un split(",") dessus, on récupèrera toutes les catégories
-      filterHTML = `<button id="${tableCategories}" class="btn-filter">Tous</button>`;
+      filterHTML = `<button id="Tous" class="btn-filter filter-selected">Tous</button>`;
 
       // Un bouton par catégorie, avec son nom en id ET en texte affiché
       tableCategories.forEach((filter) => {
@@ -83,26 +84,28 @@ try {
             btn.classList.remove("filter-selected");
           });
           // ...puis on l'ajoute uniquement au bouton cliqué (highlight visuel)
+          btnFilters[0].click();
           filter.classList.add("filter-selected");
 
+
+          console.log("click ok :", filter.id);
+          console.log("outes les pjotos :", works);
           // On récupère l'id du bouton cliqué
           // Pour "Tous" → id = "Objets,Appartements,Hotels,..." → split donne un tableau de toutes les catégories
           // Pour un filtre simple → id = "Objets" → split donne ["Objets"]
-          const id = filter.id;
-          const categories = id.split(",");
-
-          // On filtre le tableau works : on ne garde que ceux dont la catégorie est dans notre liste
-          const projectfilters = works.filter((work) =>
-            categories.includes(work.category.name)
-          );
-
-          // On construit le HTML pour la galerie principale et pour la modale
-          let projectfiltersHTML = "";
+          let projectFilters;
+          if (filter.id === "Tous") {
+            projectFilters = works;
+          } else {
+            projectFilters= works.filter((work) => work.category.name === filter.id);
+          }
+          // On construit le HTML pour la galerie principale et pour la modal
+          let projectFiltersHTML = "";
           let projectModalHTML = "";
 
-          projectfilters.forEach((data) => {
+          projectFilters.forEach((data) => {
             // Carte projet pour la page principale (figure + image + légende)
-            projectfiltersHTML += `
+            projectFiltersHTML += `
               <figure data-id="${data.id}" class="fig-project">
                 <img src="${data.imageUrl}" alt="${data.title}">
                 <figcaption>${data.title}</figcaption>
@@ -117,9 +120,20 @@ try {
                 </a>
               </div>
             `;
+            console.log("HTML généré :", projectFiltersHTML);
+            console.log("Galerie trouvée :", document.querySelector(".gallery"));
+            document.querySelector(".gallery").inneHTML = projectFiltersHTML;
 
   
       contentModal.innerHTML = projectModalHTML;
+            document.querySelectorAll (".link-icon-trash").forEach(btn => {
+              btn.addEventListener ("click", (e) => {
+                e.preventDefault();
+                const id = btn.id;
+                console.log("click sur poubelle id =", id);
+                supprimerWork (id);
+              })
+            })
           });
         });
       });
@@ -270,6 +284,95 @@ backBtn.addEventListener("click", function (e){
 });
 
 
+async function getWorks() {
+  try {
+    const reponse = await fetch("http://localhost:5678/api/works");
+    const works = await reponse.json();
+
+    console.log("works =", works);
+     console.log("gallery =", document.querySelector(".gallery"));
+     allWorks = works;
+
+    afficherWorks(allWorks);
+  } catch (error) {
+    console.error("Erreur lors de la récupération des works :", error);
+  }
+  }
+
+  function afficherWorks(works) {
+    const gallery = document.querySelector(".gallery");
+    console.log("Dans afficherWorks");
+    gallery.innerHTML = "";
+
+    works.forEach(work => {
+      const figure =document.createElement("figure");
+ 
+      const img = document.createElement("img");
+      img.src = work.imageUrl;
+      img.alt = work.title;
+
+      const figcaption = document.createElement("figcaption");
+      figcaption.textContent = work.title;
+
+      figure.appendChild(img);
+      figure.appendChild(figcaption);
+
+      gallery.appendChild(figure);
+});
+}
+   
+async function afficherFiltres(){
+  try {
+    const reponse = await  fetch("http://localhost:5678/api/categories");
+    const categories = await reponse.json();
+
+    const filtersContainer = document.querySelector(".filters");
+    filtersContainer.innerHTML = "";
+
+    const btnAll = document.createElement("button");
+    btnAll.textContent = "Tous";
+    btnAll.classList.add("filter-btn" , "active");
+    btnAll.dataset.category = "all";
+    filtersContainer.appendChild(btnAll);
+
+    categories.forEach(category => {
+      const button = document.createElement("button");
+      button.textContent = category.name;
+      button.classList.add("filter-btn");
+      button.dataset.category = category.id;
+      filtersContainer.appendChild(button);
+    });
+    addEventFilters();
+  } catch (error) {
+    console.error("Erreur lors de la récupération des catégories :", error);
+  }
+}
+
+function addEventFilters(){
+  const btnFilters = document.querySelectorAll(".filter-btn");
+
+  btnFilters.forEach(button => {
+    button.addEventListener("click", ()=> {
+      btnFilters.forEach(btn => btn.classList.remove("active"));
+      button.classList.add("active");
+
+      const category = button.dataset.category;
+      if (category === "all") {
+        afficherWorks(allWorks);
+      } else {
+        const worksFilters = allWorks.filter(work =>{
+          return work.categoryId == parseInt (category);
+        });
+        afficherWorks(worksFilters);
+      }
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await getWorks();
+  await afficherFiltres();
+});
 
 
 
@@ -278,12 +381,13 @@ backBtn.addEventListener("click", function (e){
 //Je clique sur Edition -> la modale s'affiche
 
 //2 : La modal affiche tous les works avec un bouton de suppresion (icone poubelle (a faire en dernier))
-async function getWorks() {
+async function getWorksForModal() {
   const response = await fetch("http://localhost:5678/api/works");
   const works = await response.json();
 
   return works;
 }
+
 
 linkOpenModal.addEventListener('click', () => {
   modal.showModal();
@@ -302,6 +406,94 @@ if (token) {
 } else {
   linkOpenModal.style.display = "none";
 }
+
+
+async function supprimerWork (id) {
+  try {
+    const response = await fetch(`http://localhost:5678/api/works/${id}`, {
+      method: "DELETE",
+      headers : {
+        "Authorization" : `Bearer ${token}`
+      }
+  });
+  if (!response.ok) {
+    throw new Error ("Erreur suppression");
+  }
+  allWorks = allWorks. filter(work => work.id !== (id));
+  
+  afficherWorks(allWorks);
+  afficherWorksModal();
+  } catch ( error) {
+    console.error("Erreur : ", error);
+  }
+
+
+async function afficherWorksModal() {
+  const galleryModal = document.querySelector(".gallery-modal");
+  galleryModal.innerHTML ="";
+  allWorks.forEach(work => {
+    galleryModal.innerHTML += `
+    <div data-id="${work.id}" class="div-img-modal">
+      <img class="img-modal" src="${work.imageUrl}">
+      <a id="${work.id}" class="link-icon-trash">
+        <i class="fa-solid fa-trash-can"></i>
+      </a>
+    </div>
+    `;
+  });
+   document.querySelectorAll(".link-icon-trash").forEach(btn => {
+    btn.addEventListener("click", async (event) => {
+      event.preventDefault();
+      const id = btn.id;
+      supprimerWork(id);
+    });
+  });
+}
+formAddWork.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  alert("submit ok");
+  const image = document.querySelector("#image").files[0];
+  const title = document.querySelector("#title").value;
+  const category = document.querySelector("#category").value;
+
+  if (!image || !title || !category) {
+    alert("Veuillez remplir tous les champs du formulaire.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("image", image);
+  formData.append("title", title);
+  formData.append("category", category);
+
+  try{
+  const response = await fetch("http://localhost:5678/api/works", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` }, // PAS de Content-Type avec FormData
+    body: formData,
+  });
+  
+  console.log ("status ajout :", response.status);
+
+  if (response.ok) {
+    const newWork = await response.json();
+    allWorks.push(newWork);
+    afficherWorks(allWorks);
+    afficherWorksModal();
+    formAddWork.reset();
+
+    alert("Work ajouté avec succès !");
+  } else {
+    const errorData = await response.json();
+    console.error("Erreur lors de l'ajout du work :", errorData);
+  }
+} catch (err){
+  console.error (err);
+  alert("Une erreur est survenue lors de l'ajout du work. Veuillez réessayer.");
+}
+});
+}
+
 
 
 
@@ -377,6 +569,5 @@ formAjoutWork.addEventListener("submit", async (e) => {
   }
 });
 //4 : Suppresion d'un works dans la modale et dans le DOM et affichage en direct sans rechargement de la page
-
 
 */
