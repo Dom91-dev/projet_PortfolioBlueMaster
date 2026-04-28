@@ -1,346 +1,194 @@
+
 // ===== CONNEXION DU SCRIPT =====
 // On vérifie dans la console que le fichier JS est bien chargé par le HTML
 console.log("Le formulaire est relié au JS");
 
-// On récupère les éléments du DOM où on injectera les filtres et les projets
+// ===== DÉCLARATION DES VARIABLES GLOBALES =====
+// Sélection des éléments DOM principaux
 const divFilters = document.querySelector(".filters");
 const divProjects = document.querySelector(".gallery");
 const loginLink = document.getElementById("login-link");
 const token = localStorage.getItem("token");
-const modal=document.getElementById("modal")
+const modal = document.getElementById("modal");
 const modalPart1 = document.getElementById("modal-part-1");
 const modalPart2 = document.getElementById("modal-part-2");
-const buttonAdd = document.getElementById('btn-add')
+const buttonAdd = document.getElementById("btn-add");
 const backBtn = document.getElementById("icon-back");
-const closeModal1 = document.getElementById("close-modal-1")
-const closeModal2 = document.getElementById("close-modal-2")
+const closeModal1 = document.getElementById("close-modal-1");
+const closeModal2 = document.getElementById("close-modal-2");
 const contentModal = document.getElementById("gallery-modal");
-const linkOpenModal = document.getElementById('link-modif')
-const iconBack = document.getElementById ("icon-back")
-const editionMode = document.querySelector("#edition-mode")
-const linkModif = document.querySelectorAll("link-modif")
-const openModalLink = document.getElementById("link-modif")
-const formAddWork = document.getElementById("form-ajout-work")
+const linkOpenModal = document.getElementById("link-modif");
+const editionMode = document.querySelector("#edition-mode");
+const formAddWork = document.getElementById("form-ajout-work");
 
-
-const titre = document.querySelector("#portfolio h2");
-const btnModifier= document.createElement("span");
+// Tableau pour stocker tous les travaux récupérés depuis l'API
 let allWorks = [];
 
-
- 
-// ===== APPEL API =====
-// On utilise fetch() pour récupérer les works depuis l'API (requête GET par défaut)
-// Le try/catch permet de gérer les erreurs réseau ou JS
-try {
-  fetch("http://localhost:5678/api/works")
-    // fetch renvoie une Promise → .then() s'exécute quand la réponse arrive
-    .then((response) => {
-      // On vérifie que le serveur a bien répondu (status 200-299)
-      if (response.ok === false) {
-        throw new Error("Erreur de la requête HTTP");
+// ===== FONCTIONS D'AUTHENTIFICATION =====
+// Fonction pour gérer le mode d'authentification (connecté ou non)
+function setAuthMode() {
+  if (loginLink) {
+    loginLink.textContent = token ? "Logout" : "Login";
+    loginLink.addEventListener("click", (event) => {
+      if (token) {
+        event.preventDefault();
+        localStorage.removeItem("token");
+        window.location.reload();
+      } else {
+        window.location.href = "login.html";
       }
-      // On convertit la réponse en JSON (c'est aussi une Promise)
-      return response.json();
-    })
-    .then((works) => {
-      // "works" est maintenant un tableau d'objets JS exploitable
-      
-      // ===== GÉNÉRATION DES FILTRES =====
-      // Un Set ne stocke que des valeurs uniques → pas de doublons de catégories
-      const categoryName = new Set();
-      works.forEach((work) => {
-        categoryName.add(work.category.name);
-      });
-
-      // On convertit le Set en tableau pour pouvoir le parcourir facilement
-      const tableCategories = Array.from(categoryName);
-
-      // On construit le HTML des boutons filtres
-      let filterHTML = "";
-
-      // Bouton "Tous" : son id contient TOUTES les catégories (séparées par des virgules)
-      // Astuce : quand on fera un split(",") dessus, on récupèrera toutes les catégories
-      filterHTML = `<button id="Tous" class="btn-filter filter-selected">Tous</button>`;
-
-      // Un bouton par catégorie, avec son nom en id ET en texte affiché
-      tableCategories.forEach((filter) => {
-        filterHTML += `
-          <button id="${filter}" class="btn-filter">${filter}</button>
-        `;
-      });
-
-      // On injecte tous les boutons dans le DOM
-      divFilters.innerHTML = filterHTML;
-
-      // ===== LOGIQUE DE FILTRAGE =====
-      // On sélectionne tous les boutons qu'on vient de créer
-      const btnFilters = document.querySelectorAll(".btn-filter");
-
-      btnFilters.forEach((filter) => {
-        filter.addEventListener("click", () => {
-          // On retire la classe "selected" de TOUS les boutons...
-          btnFilters.forEach((btn) => {
-            btn.classList.remove("filter-selected");
-          });
-          // ...puis on l'ajoute uniquement au bouton cliqué (highlight visuel)
-          btnFilters[0].click();
-          filter.classList.add("filter-selected");
-
-
-          console.log("click ok :", filter.id);
-          console.log("outes les pjotos :", works);
-          // On récupère l'id du bouton cliqué
-          // Pour "Tous" → id = "Objets,Appartements,Hotels,..." → split donne un tableau de toutes les catégories
-          // Pour un filtre simple → id = "Objets" → split donne ["Objets"]
-          let projectFilters;
-          if (filter.id === "Tous") {
-            projectFilters = works;
-          } else {
-            projectFilters= works.filter((work) => work.category.name === filter.id);
-          }
-          // On construit le HTML pour la galerie principale et pour la modal
-          let projectFiltersHTML = "";
-          let projectModalHTML = "";
-
-          projectFilters.forEach((data) => {
-            // Carte projet pour la page principale (figure + image + légende)
-            projectFiltersHTML += `
-              <figure data-id="${data.id}" class="fig-project">
-                <img src="${data.imageUrl}" alt="${data.title}">
-                <figcaption>${data.title}</figcaption>
-              </figure>
-            `;
-            // Carte projet pour la modale d'admin (image + icône poubelle pour suppression)
-            projectModalHTML += `
-              <div data-id="${data.id}" class="div-img-modal">
-                <img class="img-modal" src="${data.imageUrl}">
-                <a id="${data.id}" class="link-icon-trash">
-                  <i class="fa-solid fa-trash-can"></i>
-                </a>
-              </div>
-            `;
-            console.log("HTML généré :", projectFiltersHTML);
-            console.log("Galerie trouvée :", document.querySelector(".gallery"));
-            document.querySelector(".gallery").inneHTML = projectFiltersHTML;
-
-  
-      contentModal.innerHTML = projectModalHTML;
-            document.querySelectorAll (".link-icon-trash").forEach(btn => {
-              btn.addEventListener ("click", (e) => {
-                e.preventDefault();
-                const id = btn.id;
-                console.log("click sur poubelle id =", id);
-                supprimerWork (id);
-              })
-            })
-          });
-        });
-      });
-
-      // ===== CHARGEMENT INITIAL =====
-      // On simule un clic sur le premier bouton ("Tous") pour afficher tous les projets au chargement
-      btnFilters[0].click();
     });
-} catch (error) {
-  // Gestion des erreurs : affichage en console + alerte utilisateur
-  console.error(error);
-  alert("La requête n'a pas pu être effectuée");
-
-}
-
-
-//Action login et logout
-
-if (loginLink) {
-  //le tetxte change en fonction de la presence du token
-  loginLink.textContent = token ? "Logout" : "Login";
-  // met a jour le lien en foction de la présence du token
-  loginLink.addEventListener("click", (event) => {
-
-    if (token){
-      
-      event.preventDefault();
-      // deconnexion 
-      localStorage.removeItem("token");
-      window.location.reload();
-    } else {
-    //redirection vers la page de connexion
-      window.location.href = "login.html";
-    }
-  })
-}
-
-
-// Prochaine étape 
-// 1 a: Si oui -> afficher les élements admin (barre noir en haut) + bouton éditions
-if (token){
-  console.log("utilisateur connecté");
-  //afficher le boutton "mode édition"
-  if (linkOpenModal) linkOpenModal.style.display = "inline-block";
-  //afficher le bandeau noir
-  if (editionMode) editionMode.style.display = "flex";
-  //cacher les filtres
-  if (divFilters) divFilters.style.display ="none";
-} else {
-  console.log("utilisateur non connecté");
-  //masquer les bouttons
-  if (linkOpenModal) linkOpenModal.style.display ="none";
-  //masquer le bandeau noir
-  if (editionMode) editionMode.style.display = "none";
-  //afficher les filtres
-  if (divFilters) divFilters.style.display = "flex";
-}
-
-
-
-//1 b : si non -> masquer les éléments admin + bouton édition
-  console.log("masquer les éléments admin + bouton édition");
-
-
-
-// Modal 
-openModalLink.addEventListener("click", function (e){
-  e.preventDefault();
-  modal.showModal();
-
-
-modalPart1.classList.add("active");
-modalPart2.classList.remove("active");
-});
-
-buttonAdd.addEventListener("click", function (e){
-  e.preventDefault();
-  modalPart1.classList.remove("active");
-  modalPart2.classList.add("active");
-  console.log('Passage modal2');
-});
-
-iconBack.addEventListener("click",function(e){
-  e.preventDefault();
-  modalPart2.classList.remove("active");
-  modalPart1.classList.add("active");
-  console.log('Retour modal1');
-});
-
-closeModal1.addEventListener("click",function (e){
-  e.preventDefault();
-  modal.close();
-});
-
-closeModal2.addEventListener("click",function (e){
-  e.preventDefault();
-  modal.close()
-});
-
-modal.addEventListener("click",function(e){
-  const rect= modal.getBoundingClientRect();
-  const isInDialog =
-  e.clientX >= rect.left &&
-  e.clientX <= rect.right &&
-  e.clientY >= rect.top &&
-  e.clientY <= rect.bottom;
-  if (!isInDialog){
-    modal.close();
   }
-});
 
-
-
-
-console.log ("Token :", token);
-// Si le token existe, on affiche le bouton "Modifier" à côté du titre "Portfolio"
-if (token){
-  btnModifier.innerHTML = '<i class="fa-regular fa-pen-to-square"></i> Modifier';
-  btnModifier.classList.add("btn-modifier");
-  btnModifier.style.marginLeft = "10px";
-  btnModifier.style.cursor = "pointer";
-// On ajoute le bouton "Modifier" à côté du titre "Portfolio"
-  document.querySelector("#portfolio h2").appendChild(btnModifier);
-  // On ajoute un événement au clic sur le bouton "Modifier" pour ouvrir la modale
-  btnModifier.addEventListener("click", () => {
-    document.getElementById ("modal") .showModal();
-    modalPart1.classList.add("active");
-    modalPart2.classList.remove("active");
-  });
+  if (token) {
+    if (linkOpenModal) linkOpenModal.style.display = "inline-block";
+    if (editionMode) editionMode.style.display = "flex";
+    if (divFilters) divFilters.style.display = "none";
+  } else {
+    if (linkOpenModal) linkOpenModal.style.display = "none";
+    if (editionMode) editionMode.style.display = "none";
+    if (divFilters) divFilters.style.display = "flex";
+  }
 }
 
-// Au clic sur le bouton "Ajouter une photo" dans la première modale, on affiche la deuxième modale avec le formulaire
+// ===== FONCTIONS DE GESTION DE LA MODALE =====
+// Ouvre la première partie de la modale (galerie)
+function openModalPart1() {
+  if (!modal) return;
+  modalPart1.classList.add("active");
+  modalPart2.classList.remove("active");
+  modal.showModal();
+  afficherWorksModal();
+}
 
-buttonAdd.addEventListener("click", function (e){
-  e.preventDefault();
-  e.stopPropagation();
-
+// Ouvre la deuxième partie de la modale (ajout de travail)
+function openModalPart2() {
+  if (!modal) return;
   modalPart1.classList.remove("active");
   modalPart2.classList.add("active");
-});
+}
 
-backBtn.addEventListener("click", function (e){
-  e.preventDefault();
-  e.stopPropagation();
+// Ferme la modale
+function closeModal() {
+  if (!modal) return;
+  modal.close();
+}
 
-  modalPart2.classList.remove("active");
-  modalPart1.classList.add("active");
-});
+// Configure les événements pour la modale
+function setupModalEvents() {
+  if (linkOpenModal) {
+    linkOpenModal.addEventListener("click", (e) => {
+      e.preventDefault();
+      openModalPart1();
+    });
+  }
 
+  if (buttonAdd) {
+    buttonAdd.addEventListener("click", (e) => {
+      e.preventDefault();
+      openModalPart2();
+    });
+  }
 
-async function getWorks() {
+  if (backBtn) {
+    backBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      openModalPart1();
+    });
+  }
+
+  if (closeModal1) {
+    closeModal1.addEventListener("click", (e) => {
+      e.preventDefault();
+      closeModal();
+    });
+  }
+
+  if (closeModal2) {
+    closeModal2.addEventListener("click", (e) => {
+      e.preventDefault();
+      closeModal();
+    });
+  }
+
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      const rect = modal.getBoundingClientRect();
+      const isInDialog =
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom;
+      if (!isInDialog) {
+        closeModal();
+      }
+    });
+  }
+}
+
+// ===== FONCTIONS DE RÉCUPÉRATION DES DONNÉES =====
+// Récupère les travaux depuis l'API et les affiche
+async function fetchWorks() {
   try {
-    const reponse = await fetch("http://localhost:5678/api/works");
-    const works = await reponse.json();
-
-    console.log("works =", works);
-     console.log("gallery =", document.querySelector(".gallery"));
-     allWorks = works;
-
+    const response = await fetch("http://localhost:5678/api/works");
+    if (!response.ok) {
+      throw new Error("Erreur de la requête HTTP");
+    }
+    const works = await response.json();
+    allWorks = works;
     afficherWorks(allWorks);
   } catch (error) {
     console.error("Erreur lors de la récupération des works :", error);
+    alert("La requête n'a pas pu être effectuée");
   }
-  }
-
-  function afficherWorks(works) {
-    const gallery = document.querySelector(".gallery");
-    console.log("Dans afficherWorks");
-    gallery.innerHTML = "";
-
-    works.forEach(work => {
-      const figure =document.createElement("figure");
- 
-      const img = document.createElement("img");
-      img.src = work.imageUrl;
-      img.alt = work.title;
-
-      const figcaption = document.createElement("figcaption");
-      figcaption.textContent = work.title;
-
-      figure.appendChild(img);
-      figure.appendChild(figcaption);
-
-      gallery.appendChild(figure);
-});
 }
-   
-async function afficherFiltres(){
+
+// ===== FONCTIONS D'AFFICHAGE =====
+// Affiche les travaux dans la galerie principale
+function afficherWorks(works) {
+  if (!divProjects) return;
+  divProjects.innerHTML = "";
+  works.forEach((work) => {
+    const figure = document.createElement("figure");
+    figure.dataset.id = work.id;
+    figure.classList.add("fig-project");
+
+    const img = document.createElement("img");
+    img.src = work.imageUrl;
+    img.alt = work.title;
+
+    const figcaption = document.createElement("figcaption");
+    figcaption.textContent = work.title;
+
+    figure.appendChild(img);
+    figure.appendChild(figcaption);
+    divProjects.appendChild(figure);
+  });
+}
+
+// Récupère et affiche les filtres de catégories
+async function afficherFiltres() {
   try {
-    const reponse = await  fetch("http://localhost:5678/api/categories");
-    const categories = await reponse.json();
+    const response = await fetch("http://localhost:5678/api/categories");
+    if (!response.ok) {
+      throw new Error("Erreur de la requête catégories");
+    }
+    const categories = await response.json();
+    if (!divFilters) return;
 
-    const filtersContainer = document.querySelector(".filters");
-    filtersContainer.innerHTML = "";
-
+    divFilters.innerHTML = "";
     const btnAll = document.createElement("button");
     btnAll.textContent = "Tous";
-    btnAll.classList.add("filter-btn" , "active");
+    btnAll.classList.add("filter-btn", "active");
     btnAll.dataset.category = "all";
-    filtersContainer.appendChild(btnAll);
+    divFilters.appendChild(btnAll);
 
-    categories.forEach(category => {
+    categories.forEach((category) => {
       const button = document.createElement("button");
       button.textContent = category.name;
       button.classList.add("filter-btn");
       button.dataset.category = category.id;
-      filtersContainer.appendChild(button);
+      divFilters.appendChild(button);
     });
     addEventFilters();
   } catch (error) {
@@ -348,112 +196,79 @@ async function afficherFiltres(){
   }
 }
 
-function addEventFilters(){
+// Ajoute les événements de clic aux boutons de filtre
+function addEventFilters() {
   const btnFilters = document.querySelectorAll(".filter-btn");
-
-  btnFilters.forEach(button => {
-    button.addEventListener("click", ()=> {
-      btnFilters.forEach(btn => btn.classList.remove("active"));
+  btnFilters.forEach((button) => {
+    button.addEventListener("click", () => {
+      btnFilters.forEach((btn) => btn.classList.remove("active"));
       button.classList.add("active");
 
       const category = button.dataset.category;
       if (category === "all") {
         afficherWorks(allWorks);
       } else {
-        const worksFilters = allWorks.filter(work =>{
-          return work.categoryId == parseInt (category);
-        });
+        const worksFilters = allWorks.filter(
+          (work) => work.categoryId === parseInt(category, 10)
+        );
         afficherWorks(worksFilters);
       }
     });
   });
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  await getWorks();
-  await afficherFiltres();
-});
-
-
-
-
-
-//Je clique sur Edition -> la modale s'affiche
-
-//2 : La modal affiche tous les works avec un bouton de suppresion (icone poubelle (a faire en dernier))
-async function getWorksForModal() {
-  const response = await fetch("http://localhost:5678/api/works");
-  const works = await response.json();
-
-  return works;
-}
-
-
-linkOpenModal.addEventListener('click', () => {
-  modal.showModal();
-  modalPart1.setAttribute("style", "")
-})
-
-
-buttonAdd.addEventListener('click', (e) => {
-  e.preventDefault();
-  modalPart1.setAttribute('style', 'display:none')
-  modalPart1.setAttribute("style", "")
-})
-
-if (token) {
-  linkOpenModal.style.display = "inline-block";
-} else {
-  linkOpenModal.style.display = "none";
-}
-
-
-async function supprimerWork (id) {
-  try {
-    const response = await fetch(`http://localhost:5678/api/works/${id}`, {
-      method: "DELETE",
-      headers : {
-        "Authorization" : `Bearer ${token}`
-      }
-  });
-  if (!response.ok) {
-    throw new Error ("Erreur suppression");
-  }
-  allWorks = allWorks. filter(work => work.id !== (id));
-  
-  afficherWorks(allWorks);
-  afficherWorksModal();
-  } catch ( error) {
-    console.error("Erreur : ", error);
-  }
-
-
+// Affiche les travaux dans la modale avec les boutons de suppression
 async function afficherWorksModal() {
-  const galleryModal = document.querySelector(".gallery-modal");
-  galleryModal.innerHTML ="";
-  allWorks.forEach(work => {
-    galleryModal.innerHTML += `
-    <div data-id="${work.id}" class="div-img-modal">
-      <img class="img-modal" src="${work.imageUrl}">
-      <a id="${work.id}" class="link-icon-trash">
-        <i class="fa-solid fa-trash-can"></i>
-      </a>
-    </div>
+  if (!contentModal) return;
+  contentModal.innerHTML = "";
+  allWorks.forEach((work) => {
+    contentModal.innerHTML += `
+      <div data-id="${work.id}" class="div-img-modal">
+        <img class="img-modal" src="${work.imageUrl}" alt="${work.title}">
+        <a id="${work.id}" class="link-icon-trash" href="#">
+          <i class="fa-solid fa-trash-can"></i>
+        </a>
+      </div>
     `;
   });
-   document.querySelectorAll(".link-icon-trash").forEach(btn => {
+  document.querySelectorAll(".link-icon-trash").forEach((btn) => {
     btn.addEventListener("click", async (event) => {
       event.preventDefault();
       const id = btn.id;
-      supprimerWork(id);
+      await supprimerWork(id);
     });
   });
 }
-formAddWork.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  alert("submit ok");
+
+// ===== FONCTIONS DE GESTION DES TRAVAUX =====
+// Supprime un travail via l'API
+async function supprimerWork(id) {
+  try {
+    const response = await fetch(`http://localhost:5678/api/works/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Erreur suppression");
+    }
+    allWorks = allWorks.filter((work) => work.id !== parseInt(id, 10));
+    afficherWorks(allWorks);
+    afficherWorksModal();
+  } catch (error) {
+    console.error("Erreur :", error);
+    alert("Impossible de supprimer ce work.");
+  }
+}
+
+// Soumet le formulaire d'ajout d'un nouveau travail
+async function submitNewWork(event) {
+  event.preventDefault();
+  if (!formAddWork) return;
+
   const image = document.querySelector("#image").files[0];
-  const title = document.querySelector("#title").value;
+  const title = document.querySelector("#title").value.trim();
   const category = document.querySelector("#category").value;
 
   if (!image || !title || !category) {
@@ -466,108 +281,69 @@ formAddWork.addEventListener("submit", async (e) => {
   formData.append("title", title);
   formData.append("category", category);
 
-  try{
-  const response = await fetch("http://localhost:5678/api/works", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}` }, // PAS de Content-Type avec FormData
-    body: formData,
-  });
-  
-  console.log ("status ajout :", response.status);
+  try {
+    const response = await fetch("http://localhost:5678/api/works", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
 
-  if (response.ok) {
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Erreur lors de l'ajout du work :", errorData);
+      alert("Une erreur est survenue lors de l'ajout du work.");
+      return;
+    }
+
     const newWork = await response.json();
     allWorks.push(newWork);
     afficherWorks(allWorks);
     afficherWorksModal();
     formAddWork.reset();
-
+    openModalPart1();
     alert("Work ajouté avec succès !");
-  } else {
-    const errorData = await response.json();
-    console.error("Erreur lors de l'ajout du work :", errorData);
+  } catch (err) {
+    console.error(err);
+    alert("Une erreur est survenue lors de l'ajout du work. Veuillez réessayer.");
   }
-} catch (err){
-  console.error (err);
-  alert("Une erreur est survenue lors de l'ajout du work. Veuillez réessayer.");
-}
-});
 }
 
-
-
-
-/*
-async function afficherWorksModal() {
-  const works = await getWorks();
-  const galleryModal = document.querySelector(".gallery-modal");
-  galleryModal.innerHTML = "";
-  works.forEach(work => {
-    constimg = document.createElement("img");
-    img.src = work.imageUrl;
-    galleryModal.appendChild(img);
-  })
-}
-
-
-//2.2 : Bouton ajouter une photo qui va t'amener sur une 2 eme modale avec le formulaire qui permet de créer un work (image, titre, une catégorie)
-const btnAjoutPhoto = document.querySelector(".btn-ajout-photo");
-const modalGallery = document.querySelector(".modal-gallery");
-const modalForm = document.querySelector(".modal-form");
-btnAjoutPhoto.addEventListener("click", () => {
-    console.log("ici")
-    modalForm.classList.remove("hidden");
- 
-})
-//3 : On sauvegarde (e.prevendDefault()) pour ne pas recharger la page lors de l'envoie
-const formAjoutWork = document.querySelector("#form-ajout-work");
-formAjoutWork.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  console.log("formulaire envoyé");
-
-});
-
-formAjoutWork.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const image = document.querySelector("#image").files[0];
-  const title = document.querySelector("#title").value;
-  const category = document.querySelector("#category").value;
-  console.log(image, title, category);
-});
-
-const formData = new FormData();
-formData.append("image", image);
-formData.append("title", title);
-formData.append("category", category);
-
-console.log(formData);
-
-formAjoutWork.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const token = localStorage.getItem("token");
-
-  const image = document.querySelector("#image").files[0];
-  const title = document.querySelector("#title").value;
-  const category = document.querySelector("#category").value;
-
-  const formData = new FormData();
-  formData.append("image", image);
-  formData.append("title", title);
-  formData.append("category", category);
-
-  const reponse = await fetch("http://Localhost:5678/api/works", {
-    method: "POST",
-    headers: {
-      Authorization: 'Bearer ${token}'
-    },
-    body: formData
-  });
-  if (respons.ok) {
-    console.log("Work ajouté avec succès");
-  } else {
-    console.log("Erreur lors de l'ajout du work");
+// Ajoute le bouton "Modifier" si l'utilisateur est connecté
+function addModifierButton() {
+  if (!token) return;
+  const btnModifier = document.createElement("span");
+  btnModifier.innerHTML = '<i class="fa-regular fa-pen-to-square"></i> Modifier';
+  btnModifier.classList.add("btn-modifier");
+  btnModifier.style.marginLeft = "10px";
+  btnModifier.style.cursor = "pointer";
+  const portfolioTitle = document.querySelector("#portfolio h2");
+  if (portfolioTitle) {
+    portfolioTitle.appendChild(btnModifier);
+    btnModifier.addEventListener("click", () => {
+      openModalPart1();
+    });
   }
-});
-//4 : Suppresion d'un works dans la modale et dans le DOM et affichage en direct sans rechargement de la page
+}
 
-*/
+// ===== FONCTION D'INITIALISATION =====
+// Initialise la page en configurant l'authentification, les événements et en chargeant les données
+async function init() {
+  setAuthMode();
+  setupModalEvents();
+  await fetchWorks();
+  await afficherFiltres();
+  if (token) {
+    addModifierButton();
+  }
+}
+
+// ===== ÉCOUTEURS D'ÉVÉNEMENTS =====
+// Écouteur pour la soumission du formulaire d'ajout de travail
+if (formAddWork) {
+  formAddWork.addEventListener("submit", submitNewWork);
+}
+
+// Écouteur pour l'initialisation une fois le DOM chargé
+document.addEventListener("DOMContentLoaded", init);
