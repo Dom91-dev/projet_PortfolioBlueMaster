@@ -13,37 +13,76 @@ console.log("Le formulaire est relié au JS")
 const form = document.getElementById("login-form")
 const inputEmail = document.getElementById("email")
 const inputPassword = document.getElementById("password")
+const emailError = document.getElementById("email-error")
+const passwordError = document.getElementById("password-error")
+const loginError = document.getElementById("login-error")
 console.log(form)
+
+// Fonction pour afficher les messages d'erreur
+function showLoginError(field, message) {
+	if (field === "email") {
+		emailError.textContent = message
+		emailError.style.display = message ? "block" : "none"
+	} else if (field === "password") {
+		passwordError.textContent = message
+		passwordError.style.display = message ? "block" : "none"
+	} else if (field === "general") {
+		loginError.textContent = message
+		loginError.style.display = message ? "block" : "none"
+	}
+}
+
+// Fonction pour réinitialiser les erreurs
+function clearLoginErrors() {
+	emailError.textContent = ""
+	passwordError.textContent = ""
+	loginError.textContent = ""
+	emailError.style.display = "none"
+	passwordError.style.display = "none"
+	loginError.style.display = "none"
+}
 
 // 2.2 : On crée un écouteur d'évènement sur le formulaire pour écouter la soumission du formulaire
 form.addEventListener("submit", event => {
-    // On empêche le comportement par défaut du formulaire (rechargement de la page)
-    event.preventDefault()
+	// On empêche le comportement par défaut du formulaire (rechargement de la page)
+	event.preventDefault()
+	clearLoginErrors()
 
-    // On créer une const typé pour l'API qui contient les données du formulaire
-    const objectJsonLogin = {
-        email: inputEmail.value, // toto@toto.fr
-        password: inputPassword.value, // 12345678
-    }
+	// Validation des champs
+	if (!inputEmail.value.trim()) {
+		showLoginError("email", "Veuillez entrer votre email.")
+		return
+	}
+	if (!inputPassword.value) {
+		showLoginError("password", "Veuillez entrer votre mot de passe.")
+		return
+	}
 
-    // On transforme l'objet en JSON pour pouvoir l'envoyer à l'API
-    const bodyRequete = JSON.stringify(objectJsonLogin)
+	// On créer une const typé pour l'API qui contient les données du formulaire
+	const objectJsonLogin = {
+		email: inputEmail.value, // toto@toto.fr
+		password: inputPassword.value, // 12345678
+	}
 
-    // On envoi la requete à l'API (BACKEND) pour vérifier les données du formulaire
-    fetch("http://localhost:5678/api/users/login", {
-        method: "POST", // Par défaut si pas de méthode = GET
-        headers: { "Content-Type": "application/json" },
-        body: bodyRequete,
-    }).then(response => {
-        if (response.ok) { // SI OK (20*) https://developer.mozilla.org/fr/docs/Web/HTTP/Reference/Status
-            return response.json()
-        } else {
-            console.alert("erreur de connexion")
-        }
-    }).then(({ token }) => { // On récupère le token de l'API (BACKEND) et on le stocke dans le localStorage du navigateur
-        window.localStorage.setItem("token", token)
-        window.location.href = "../../index.html"
-    }).catch(() => {  // En cas d'erreur (ex: serveur éteint, mauvaise adresse, etc ...)
-        console.error("Connexion impossible")
-    })
+	// On transforme l'objet en JSON pour pouvoir l'envoyer à l'API
+	const bodyRequete = JSON.stringify(objectJsonLogin)
+
+	// On envoi la requete à l'API (BACKEND) pour vérifier les données du formulaire
+	fetch("http://localhost:5678/api/users/login", {
+		method: "POST", // Par défaut si pas de méthode = GET
+		headers: { "Content-Type": "application/json" },
+		body: bodyRequete,
+	}).then(response => {
+		if (response.ok) { // SI OK (20*) https://developer.mozilla.org/fr/docs/Web/HTTP/Reference/Status
+			return response.json()
+		} else {
+			showLoginError("general", "Email ou mot de passe incorrect.")
+			throw new Error ("Erreur l'ors de la connexion")
+		}
+	}).then(({ token }) => { // On récupère le token de l'API (BACKEND) et on le stocke dans le localStorage du navigateur
+		window.localStorage.setItem("token", token)
+		window.location.href = "../../index.html"
+	}).catch(() => {  // En cas d'erreur (ex: serveur éteint, mauvaise adresse, etc ...)
+		console.error("Connexion impossible")
+	})
 })

@@ -22,6 +22,7 @@ const editionMode = document.querySelector("#edition-mode");
 const formAddWork = document.getElementById("form-ajout-work");
 const previewImage = document.getElementById("preview");
 const imageInput = document.querySelector("#image");
+const uploadPreviewWrapper = document.querySelector(".upload-preview");
 
 // Tableau pour stocker tous les travaux récupérés depuis l'API
 let allWorks = [];
@@ -268,9 +269,29 @@ async function supprimerWork(id) {
   }
 }
 
+// Fonction pour afficher les messages d'erreur
+function showErrorMessage(elementId, message) {
+  const errorElement = document.getElementById(elementId);
+  if (errorElement) {
+    errorElement.textContent = message;
+    errorElement.classList.add("show");
+  }
+}
+
+// Fonction pour réinitialiser tous les messages d'erreur
+function clearErrorMessages() {
+  const errorElements = document.querySelectorAll(".error-message");
+  errorElements.forEach((el) => {
+    el.textContent = "";
+    el.classList.remove("show");
+  });
+}
+
 // Soumet le formulaire d'ajout d'un nouveau travail
 async function submitNewWork(event) {
   event.preventDefault();
+  clearErrorMessages();
+  
   if (!formAddWork) return;
 
   const image = document.querySelector("#image").files[0];
@@ -278,7 +299,9 @@ async function submitNewWork(event) {
   const category = document.querySelector("#category").value;
 
   if (!image || !title || !category) {
-    alert("Veuillez remplir tous les champs du formulaire.");
+    if (!image) showErrorMessage("error-image", "Veuillez sélectionner une image.");
+    if (!title) showErrorMessage("error-title", "Veuillez entrer un titre.");
+    if (!category) showErrorMessage("error-category", "Veuillez sélectionner une catégorie.");
     return;
   }
 
@@ -299,7 +322,7 @@ async function submitNewWork(event) {
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Erreur lors de l'ajout du work :", errorData);
-      alert("Une erreur est survenue lors de l'ajout du work.");
+      showErrorMessage("error-general", "Une erreur est survenue lors de l'ajout du work.");
       return;
     }
 
@@ -308,11 +331,12 @@ async function submitNewWork(event) {
     afficherWorks(allWorks);
     afficherWorksModal();
     formAddWork.reset();
+    uploadPreviewWrapper?.classList.remove("has-preview");
+    previewImage.style.display = "none";
     openModalPart1();
-    alert("Work ajouté avec succès !");
   } catch (err) {
     console.error(err);
-    alert("Une erreur est survenue lors de l'ajout du work. Veuillez réessayer.");
+    showErrorMessage("error-general", "Une erreur est survenue lors de l'ajout du work. Veuillez réessayer.");
   }
 }
 
@@ -381,10 +405,12 @@ if (imageInput) {
       reader.onload = (e) => {
         previewImage.src = e.target.result;
         previewImage.style.display = "block";
+        uploadPreviewWrapper?.classList.add("has-preview");
       };
       reader.readAsDataURL(file);
     } else {
       previewImage.style.display = "none";
+      uploadPreviewWrapper?.classList.remove("has-preview");
     }
   });
 }

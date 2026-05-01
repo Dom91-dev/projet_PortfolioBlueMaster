@@ -84,16 +84,25 @@
 			<div id="modal-part-2" class="modal-view">
 				<div id="div-icon-close-pt2">
 					<a href="#" id="icon-back"> <i class="fa-solid fa-arrow-left"></i></a>
-						<a href="#" class="icon-close" id="close-modal-2"><i class="fa-solid fa-xmark"></i></a>
+					<a href="#" class="icon-close" id="close-modal-2"><i class="fa-solid fa-xmark"></i></a>
 				</div>
 				<h3>Ajout photo</h3>
 				<form id="form-ajout-work">
-					<input type="file" id="image" accept="image/*">
-					<img id="preview" src="#" alt="" accept="image/*">
+					<span class="error-message" id="error-general"></span>
+					<div class="upload-preview">
+						<label for="image" class="upload-label">Choisir un fichier</label>
+						<input type="file" id="image" accept="image/*">
+						<img id="preview" src="#" alt="Preview">
+					</div>
+					<span class="error-message" id="error-image"></span>
+					<label for="title">Titre</label>
 					<input type="text" id="title" placeholder="Titre">
+					<span class="error-message" id="error-title"></span>
+					<label for="category">Catégorie</label>
 					<select id="category">
 						<option value="">Sélectionné une catégorie</option>
 					</select>
+					<span class="error-message" id="error-category"></span>
 					<button type="submit">Valider</button>
 				</form>
 			</div>
