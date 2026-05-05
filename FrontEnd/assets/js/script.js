@@ -8,7 +8,7 @@ console.log("Le formulaire est relié au JS");
 const divFilters = document.querySelector(".filters");
 const divProjects = document.querySelector(".gallery");
 const loginLink = document.getElementById("login-link");
-const token = localStorage.getItem("token");
+const token = localStorage.getItem("token");//********************************* */
 const modal = document.getElementById("modal");
 const modalPart1 = document.getElementById("modal-part-1");
 const modalPart2 = document.getElementById("modal-part-2");
@@ -24,13 +24,12 @@ const previewImage = document.getElementById("preview");
 const imageInput = document.querySelector("#image");
 const uploadPreviewWrapper = document.querySelector(".upload-preview");
 
-// Tableau pour stocker tous les travaux récupérés depuis l'API
 let allWorks = [];
 let allCategories = [];
 
 // ===== FONCTIONS D'AUTHENTIFICATION =====
 // Fonction pour gérer le mode d'authentification (connecté ou non)
-function setAuthMode() {
+function setAuthMode() {//********************************* */
   if (loginLink) {
     loginLink.textContent = token ? "Logout" : "Login";
     loginLink.addEventListener("click", (event) => {
@@ -56,7 +55,6 @@ function setAuthMode() {
 }
 
 // ===== FONCTIONS DE GESTION DE LA MODALE =====
-// Ouvre la première partie de la modale (galerie)
 function openModalPart1() {
   if (!modal) return;
   modalPart1.classList.add("active");
@@ -65,20 +63,17 @@ function openModalPart1() {
   afficherWorksModal();
 }
 
-// Ouvre la deuxième partie de la modale (ajout de travail)
 function openModalPart2() {
   if (!modal) return;
   modalPart1.classList.remove("active");
   modalPart2.classList.add("active");
 }
 
-// Ferme la modale
 function closeModal() {
   if (!modal) return;
   modal.close();
 }
 
-// Configure les événements pour la modale
 function setupModalEvents() {
   if (linkOpenModal) {
     linkOpenModal.addEventListener("click", (e) => {
@@ -131,16 +126,15 @@ function setupModalEvents() {
 }
 
 // ===== FONCTIONS DE RÉCUPÉRATION DES DONNÉES =====
-// Récupère les travaux depuis l'API et les affiche
-async function fetchWorks() {
+async function fetchWorks() {//********************************************************** */ */
   try {
-    const response = await fetch("http://localhost:5678/api/works");
+    const response = await fetch("http://localhost:5678/api/works");//********************************************************************* */
     if (!response.ok) {
       throw new Error("Erreur de la requête HTTP");
     }
-    const works = await response.json();
+    const works = await response.json();//********************************************************************* */
     allWorks = works;
-    afficherWorks(allWorks);
+    afficherWorks(allWorks);//********************************************************************* */
   } catch (error) {
     console.error("Erreur lors de la récupération des works :", error);
     alert("La requête n'a pas pu être effectuée");
@@ -148,8 +142,7 @@ async function fetchWorks() {
 }
 
 // ===== FONCTIONS D'AFFICHAGE =====
-// Affiche les travaux dans la galerie principale
-function afficherWorks(works) {
+function afficherWorks(works) {//********************************************************************* */
   if (!divProjects) return;
   divProjects.innerHTML = "";
   works.forEach((work) => {
@@ -170,7 +163,7 @@ function afficherWorks(works) {
   });
 }
 
-// Récupère et affiche les filtres de catégories
+
 async function afficherFiltres() {
   try {
     const response = await fetch("http://localhost:5678/api/categories");
@@ -197,13 +190,13 @@ async function afficherFiltres() {
       button.dataset.category = category.id;
       divFilters.appendChild(button);
     });
-    addEventFilters();
+    addEventFilters();//********************************************************************* */
   } catch (error) {
     console.error("Erreur lors de la récupération des catégories :", error);
   }
 }
 
-// Ajoute les événements de clic aux boutons de filtre
+
 function addEventFilters() {
   const btnFilters = document.querySelectorAll(".filter-btn");
   btnFilters.forEach((button) => {
@@ -224,7 +217,6 @@ function addEventFilters() {
   });
 }
 
-// Affiche les travaux dans la modale avec les boutons de suppression
 async function afficherWorksModal() {
   if (!contentModal) return;
   contentModal.innerHTML = "";
@@ -248,8 +240,7 @@ async function afficherWorksModal() {
 }
 
 // ===== FONCTIONS DE GESTION DES TRAVAUX =====
-// Supprime un travail via l'API
-async function supprimerWork(id) {
+async function supprimerWork(id) {//********************************************************************* */
   try {
     const response = await fetch(`http://localhost:5678/api/works/${id}`, {
       method: "DELETE",
@@ -269,7 +260,6 @@ async function supprimerWork(id) {
   }
 }
 
-// Fonction pour afficher les messages d'erreur
 function showErrorMessage(elementId, message) {
   const errorElement = document.getElementById(elementId);
   if (errorElement) {
@@ -278,7 +268,6 @@ function showErrorMessage(elementId, message) {
   }
 }
 
-// Fonction pour réinitialiser tous les messages d'erreur
 function clearErrorMessages() {
   const errorElements = document.querySelectorAll(".error-message");
   errorElements.forEach((el) => {
@@ -287,8 +276,7 @@ function clearErrorMessages() {
   });
 }
 
-// Soumet le formulaire d'ajout d'un nouveau travail
-async function submitNewWork(event) {
+async function submitNewWork(event) {//********************************************************************* */
   event.preventDefault();
   clearErrorMessages();
   
@@ -358,7 +346,6 @@ function addModifierButton() {
 }
 
 // ===== FONCTION D'INITIALISATION =====
-// Initialise la page en configurant l'authentification, les événements et en chargeant les données
 async function init() {
   setAuthMode();
   setupModalEvents();
@@ -371,7 +358,6 @@ async function init() {
 }
 
 // ===== ÉCOUTEURS D'ÉVÉNEMENTS =====
-// Écouteur pour la soumission du formulaire d'ajout de travail
 if (formAddWork) {
   formAddWork.addEventListener("submit", submitNewWork);
 }
