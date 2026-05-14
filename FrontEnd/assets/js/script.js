@@ -190,7 +190,7 @@ async function afficherFiltres() {
       button.dataset.category = category.id;
       divFilters.appendChild(button);
     });
-    addEventFilters();//********************************************************************* */
+    addEventFilters();
   } catch (error) {
     console.error("Erreur lors de la récupération des catégories :", error);
   }
@@ -240,7 +240,7 @@ async function afficherWorksModal() {
 }
 
 // ===== FONCTIONS DE GESTION DES TRAVAUX =====
-async function supprimerWork(id) {//********************************************************************* */
+async function supprimerWork(id) {
   try {
     const response = await fetch(`http://localhost:5678/api/works/${id}`, {
       method: "DELETE",

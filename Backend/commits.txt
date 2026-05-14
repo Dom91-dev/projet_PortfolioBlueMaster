@@ -1,0 +1,96 @@
+commit d2178f16d6fb4261436dca2ee8a7df8770f0e239
+Author: dominique <dominiquenzg@gmail.com>
+Date:   Tue May 5 15:29:14 2026 +0200
+
+    suppression des commentaire
+
+commit 2b593390404f14902832df29d23fd8fdfb4a7380
+Author: dominique <dominiquenzg@gmail.com>
+Date:   Fri May 1 17:23:44 2026 +0200
+
+    finalisation du css de la modal/ajout de la preview et du message de mail ou mot de passe incorrect
+    
+    Co-authored-by: Copilot <copilot@github.com>
+
+commit 11d0f1a4947b5582b777e65c6d11e2eda4feb983
+Author: dominique <dominiquenzg@gmail.com>
+Date:   Tue Apr 28 18:42:24 2026 +0200
+
+    modification des filtres/du modale / ajout dupreview
+
+commit 99574c2daad0195987f318d382990d5f9604e699
+Author: dominique <dominiquenzg@gmail.com>
+Date:   Tue Apr 28 02:18:23 2026 +0200
+
+    possibilité d'ajout des works/ annotation du code /suppression des commentaire innutiles
+
+commit 3f903b72868e26cddd86bac236d347de60e84f41
+Author: dominique <dominiquenzg@gmail.com>
+Date:   Tue Apr 28 02:02:12 2026 +0200
+
+    ajoutdes bouton de suppresions des works
+
+commit 0696b6c8428e1a5894076e43559b31824bf1d996
+Author: dominique <dominiquenzg@gmail.com>
+Date:   Mon Apr 13 18:52:48 2026 +0200
+
+    modif boutton via css/ version ameliorer de l'annotation javascript
+
+commit 72f9f3debd4fb29fd9a9da7db7a2a28718c11a90
+Author: dominique <dominiquenzg@gmail.com>
+Date:   Sun Apr 5 02:33:33 2026 +0200
+
+    modification 2 modal /loginlogout/modeedition
+
+commit dfd1b58b1df67af0265884b66dc1ed30e27ab83f
+Author: dominique <dominiquenzg@gmail.com>
+Date:   Sat Apr 4 23:47:18 2026 +0200
+
+    modification final : ajout modal part 1 et part 2
+    
+    stylisation de l'interface ajout des photo de la page d'acceuil
+    et du design des modal
+    
+    Co-authored-by: Lopez <pOwn3d@users.noreply.github.com>
+
+commit 0bec9ad4e0adfc7228e7b24579857d1f9cfd36a4
+Author: dominique <dominiquenzg@gmail.com>
+Date:   Mon Mar 23 17:48:50 2026 +0100
+
+    ajout du bandeau noir Mode édition et du bouton édition
+
+commit 9194d8a6611dabb6cbade94b77635dfa7b57e112
+Author: dominique <dominiquenzg@gmail.com>
+Date:   Mon Mar 16 17:38:06 2026 +0100
+
+    ajout du bouton de formulaire/code de récuperation des champs et de l'envoie au Backend
+
+commit d68cc5ca336e87adbc2a6f844c5d3b785f69491b
+Author: dominique <dominiquenzg@gmail.com>
+Date:   Tue Mar 10 15:50:33 2026 +0100
+
+    mise en place du cheking de la connexion de l'utilisateur
+
+commit 7684378ed5791017253c7837c918c9a44cfb41b1
+Author: dominique <dominiquenzg@gmail.com>
+Date:   Mon Mar 9 18:47:37 2026 +0100
+
+    stylisation globale de la page de login
+
+commit 9a7c053dfd96e187180aab986ddd6383a02073f8
+Author: dominique <dominiquenzg@gmail.com>
+Date:   Thu Feb 19 18:13:21 2026 +0100
+
+    Formulaire login ciblé dans le DOM /Recuperation des données des works / verification des données recupérées/Affichage des categories/Et affichage dans le DOM
+
+commit 7f165630b865de79d1d573c15684b1d5bdb97e67
+Author: dominique <dominiquenzg@gmail.com>
+Date:   Wed Feb 18 13:10:57 2026 +0100
+
+    Ajout package-lock.json
+
+commit 8710f1d5b8edefc7487d6df198f27129eb7923df
+Author: dominique <dominiquenzg@gmail.com>
+Date:   Tue Feb 17 15:22:08 2026 +0100
+
+    Premier commit-mise en place login + API

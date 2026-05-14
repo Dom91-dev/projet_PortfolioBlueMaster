@@ -36,7 +36,7 @@ function clearLoginErrors() {
 	loginError.style.display = "none"
 }
 
-// 2.2 : On crée un écouteur d'évènement sur le formulaire pour écouter la soumission du formulaire
+// On crée un écouteur d'évènement sur le formulaire pour écouter la soumission du formulaire
 form.addEventListener("submit", event => {
 
 	event.preventDefault()
